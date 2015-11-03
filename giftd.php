@@ -3,6 +3,7 @@
 defined('_JEXEC') or die('Direct Access not allowed.');
 
 require_once JPATH_ROOT . '/plugins/system/giftd/lib/GiftdApiClient.php';
+
 use Joomla\Registry\Registry;
 
 class PlgSystemGiftd extends JPlugin
@@ -16,6 +17,11 @@ class PlgSystemGiftd extends JPlugin
 		$shop = $this->params->get('shop', 'virtuemart');
 
 		require_once JPATH_ROOT . '/plugins/system/giftd/includes/'.$shop.'.php';
+
+		if($shop == 'virtuemart')
+		{
+			require_once JPATH_ROOT . '/plugins/system/giftd/includes/cart.php';
+		}
 
 		$this->options = array(
 			'com_virtuemart', 'com_hikashop', 'com_jshopping',
