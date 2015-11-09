@@ -18,10 +18,10 @@ class PlgSystemGiftd extends JPlugin
 
 		require_once JPATH_ROOT . '/plugins/system/giftd/includes/'.$shop.'.php';
 
-		if($shop == 'virtuemart')
-		{
-			require_once JPATH_ROOT . '/plugins/system/giftd/includes/cart.php';
-		}
+//		if($shop == 'virtuemart')
+//		{
+//			require_once JPATH_ROOT . '/plugins/system/giftd/includes/cart.php';
+//		}
 
 		$this->options = array(
 			'com_virtuemart', 'com_hikashop', 'com_jshopping',
@@ -227,6 +227,51 @@ class PlgSystemGiftd extends JPlugin
         return $this->useCoupon($code, $amount, $amountTotal, $orderId);
 	}
 
+	/** Virtuemart on delete from cart
+	 * @param $cart
+	 * @param $prod_id
+	 */
+//	public function plgVmOnRemoveFromCart($cart,$prod_id)
+//	{
+//		echo '<pre>'; var_dump($cart); echo '</pre>'; die;
+//		$summ = $cart->cartPrices['salesPrice'];
+//		$coupon = '';
+//		GiftdVirtuemartHelper::checkVMCoupon($coupon, $summ);
+//	}
+	/** Virtuemart on refresh cart
+	 * @param $virtuemart_paymentmethod_id
+	 * @param $paymentCurrency
+	 */
+	public function plgVmgetPaymentCurrency($virtuemart_paymentmethod_id, &$paymentCurrency)
+	{
+		$app = JFactory::getApplication();
+		$task = $app->input->getCmd('task', '');
+		$cart = VirtueMartCart::getCart();
+		$code = $cart->couponCode;
+
+		$partner_token_prefix = $this->params->get('partner_token_prefix', '');
+
+		if(empty($code) || empty($partner_token_prefix) || strpos($code, $partner_token_prefix) !== 0)
+		{
+			return;
+		}
+//echo '<pre>'; var_dump($_REQUEST); echo '</pre>'; die;
+		// task=updatecart
+		$summ = $cart->cartPrices['salesPrice'];
+
+		$msg = GiftdVirtuemartHelper::checkVMCoupon($code, $summ);
+
+		if(!empty($msg))
+		{
+			$cart->couponCode = '';
+			$cart->setCartIntoSession();
+			$layoutName = $cart->getLayoutUrlString();
+
+			if($task == 'updatecart'){
+				$app->redirect('index.php?option=com_virtuemart&view=cart'.$layoutName , $msg);
+			}
+		}
+	}
 
     //JoomShopping Create coupon
     public function onLoadDiscountSave(){

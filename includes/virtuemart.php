@@ -53,4 +53,14 @@ class GiftdVirtuemartHelper
         $orders = JTable::getInstance('Orders', 'Table');
         $orders->delete($orderId);
     }
+
+    static function checkVMCoupon($coupon_code, $summ)
+    {
+        if (!class_exists('CouponHelper')) {
+            require(VMPATH_SITE . DS . 'helpers' . DS . 'coupon.php');
+        }
+
+        $msg = CouponHelper::ValidateCouponCode($coupon_code, $summ);
+        return $msg;
+    }
 }
